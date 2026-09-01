@@ -1,0 +1,43 @@
+{
+  "name": "refrens-api-skill",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Safe Refrens API CLI and GitHub skill for authenticated requests and invoice batch workflows.",
+  "type": "module",
+  "bin": {
+    "refrens-api": "./bin/refrens-api.js"
+  },
+  "files": [
+    "bin/",
+    "skills/",
+    "README.md",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    ".credentials.example"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "test:watch": "node --test --watch",
+    "pack:check": "npm pack --dry-run"
+  },
+  "keywords": [
+    "refrens",
+    "github-skill",
+    "skills",
+    "cli",
+    "api",
+    "invoice"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ashwinning/refrens-api-skill.git"
+  },
+  "homepage": "https://github.com/Ashwinning/refrens-api-skill#readme",
+  "bugs": {
+    "url": "https://github.com/Ashwinning/refrens-api-skill/issues"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.18"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "defaults": {
+    "path": "/businesses/:urlKey/invoices",
+    "currency": "INR",
+    "invoiceType": "INVOICE",
+    "billedTo": {
+      "name": "Example Client Pvt Ltd",
+      "country": "IN"
+    },
+    "itemDefaults": {
+      "name": "Professional Services",
+      "rate": 25000,
+      "gstRate": 18
+    }
+  },
+  "invoices": [
+    {
+      "key": "aug-2026",
+      "invoiceNumber": "INV-2026-08",
+      "invoiceDate": "2026-08-31",
+      "items": [
+        {
+          "description": "Implementation sprint",
+          "quantity": 3
+        },
+        {
+          "description": "Launch support",
+          "quantity": 1,
+          "rate": 28000
+        }
+      ]
+    },
+    {
+      "key": "sept-2026",
+      "invoiceNumber": "INV-2026-09",
+      "invoiceDate": "2026-09-30",
+      "items": [
+        {
+          "description": "Monthly support retainer",
+          "quantity": 1
+        }
+      ]
+    }
+  ]
+}

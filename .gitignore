@@ -1,0 +1,12 @@
+node_modules/
+*.log
+*.tgz
+.DS_Store
+Thumbs.db
+.env
+.env.*
+.credentials
+.refrens-token.dpapi
+PUBLISHING.md
+coverage/
+npm-debug.log*

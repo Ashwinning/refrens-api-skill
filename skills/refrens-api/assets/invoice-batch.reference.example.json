@@ -1,0 +1,36 @@
+{
+  "defaults": {
+    "path": "/businesses/:urlKey/invoices",
+    "itemDefaults": {
+      "gstRate": 18
+    }
+  },
+  "referenceInvoice": {
+    "invoiceId": "replace-with-an-existing-invoice-id",
+    "copyInvoiceFields": [
+      "currency",
+      "invoiceType",
+      "billedBy",
+      "billedTo"
+    ],
+    "copyItemFields": [
+      "name",
+      "rate",
+      "gstRate"
+    ],
+    "referenceItemIndex": 0
+  },
+  "invoices": [
+    {
+      "key": "aug-2026",
+      "invoiceNumber": "INV-2026-08",
+      "invoiceDate": "2026-08-31",
+      "items": [
+        {
+          "description": "Implementation sprint",
+          "quantity": 3
+        }
+      ]
+    }
+  ]
+}
