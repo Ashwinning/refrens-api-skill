@@ -315,7 +315,7 @@ async function collectInteractiveCredentials({
 
   if (!canPrompt && !hasPrefilledRequiredValues) {
     throw new Error(
-      "Interactive setup requires a terminal. For automated setup, provide REFRENS_SETUP_APP_ID, REFRENS_SETUP_APP_SECRET, and REFRENS_SETUP_URL_KEY."
+      `${missingCredentialsMessage(credentialsPath)} For automated setup, provide REFRENS_SETUP_APP_ID, REFRENS_SETUP_APP_SECRET, and REFRENS_SETUP_URL_KEY.`
     );
   }
 
@@ -446,10 +446,6 @@ function ensureCredentialSafety(credentialsPath, options, command) {
 async function ensureCredentialsFile(credentialsPath, baseUrl) {
   if (credentialsFileExists(credentialsPath)) {
     return null;
-  }
-
-  if (!interactivePromptsAvailable()) {
-    throw new Error(missingCredentialsMessage(credentialsPath));
   }
 
   const setupResult = await collectInteractiveCredentials({
