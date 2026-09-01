@@ -21,6 +21,8 @@ Once API access is enabled, generate keys from the Refrens dashboard integration
 
 `Business Settings -> Integrations -> Accounting Integrations -> Generate API Keys`
 
+If the local `.credentials` file does not exist yet, run `refrens-api setup` or `npx refrens-api-skill setup` and keep this guide open while you copy the values.
+
 ## Supported local credential names
 
 The CLI reads these names from `.credentials`:

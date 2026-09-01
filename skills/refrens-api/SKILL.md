@@ -11,11 +11,14 @@ Use the official Refrens docs at <https://www.refrens.com/api/docs/> as the sour
 
 ## Before every live operation
 
-1. Read `references/authentication.md`.
-2. Read `references/endpoint-matrix.md`.
-3. Read `references/resource-notes.md` for the resource you plan to use.
-4. Read `references/safety-and-validation.md` before any `POST` or `PATCH`.
-5. Use `scripts/refrens-api.js` or the published npm package rather than inventing raw requests.
+1. If `.credentials` is missing, first read `references/getting-credentials.md` and either:
+   - ask the user for `app_id`, `app_secret`, and `url_key`, or
+   - tell them to run `npx refrens-api-skill setup`
+2. Read `references/authentication.md`.
+3. Read `references/endpoint-matrix.md`.
+4. Read `references/resource-notes.md` for the resource you plan to use.
+5. Read `references/safety-and-validation.md` before any `POST` or `PATCH`.
+6. Use `scripts/refrens-api.js` or the published npm package rather than inventing raw requests.
 
 ## Included tooling
 
@@ -54,6 +57,12 @@ npx skills add Ashwinning/refrens-api-skill --skill refrens-api -a github-copilo
 
 ```powershell
 node .\scripts\refrens-api.js check
+```
+
+### First-time setup
+
+```powershell
+node .\scripts\refrens-api.js setup
 ```
 
 ### Authenticate

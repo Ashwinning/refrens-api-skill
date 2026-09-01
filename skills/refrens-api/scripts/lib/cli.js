@@ -1,9 +1,14 @@
 import path from "node:path";
+import readline from "node:readline/promises";
+import { Writable } from "node:stream";
+import { DEFAULT_BASE_URL } from "./constants.js";
 import {
+  credentialsFileExists,
   credentialPermissionsSafe,
   parseCredentialsFile,
   requireCredentials,
-  resolveCredentialsPath
+  resolveCredentialsPath,
+  writeCredentialsFile
 } from "./credentials.js";
 import {
   authenticate,
@@ -11,6 +16,7 @@ import {
   expandPath,
   HttpError,
   loadBodyFile,
+  originFor,
   requestJson,
   requireOriginApproval,
   resolveBaseUrl,
@@ -41,6 +47,7 @@ const HELP_TEXT = `refrens-api
 Safe Refrens API helper for authentication, documented requests, and invoice batches.
 
 Usage:
+  refrens-api setup [options]
   refrens-api check [options]
   refrens-api auth [options]
   refrens-api request <GET|POST|PATCH> <path> [options]
@@ -52,6 +59,9 @@ Common options:
   --approve-origin <url>    Required for live auth and live requests
   --timeout <seconds>       HTTP timeout. Default: 30
   --allow-unsafe-credential-permissions
+
+Setup options:
+  --overwrite               Replace an existing credentials file
 
 Request options:
   --body-file <file>        UTF-8 JSON file for POST/PATCH payloads
@@ -68,11 +78,21 @@ Invoice batch options:
   --confirm-hash <key=hash> Repeat for every invoice during create
 
 Examples:
+  refrens-api setup
   refrens-api check
   refrens-api auth --approve-origin https://api.refrens.com --validate
   refrens-api request GET '/businesses/:urlKey/invoices?$limit=5' --approve-origin https://api.refrens.com
   refrens-api request POST /businesses/:urlKey/invoices --body-file invoice.json --dry-run
   refrens-api invoice-batch preview --input invoice-batch.json
+`;
+
+const CREDENTIALS_GUIDE_URL =
+  "https://github.com/Ashwinning/refrens-api-skill/blob/main/skills/refrens-api/references/getting-credentials.md";
+
+const SETUP_HELP = `${HELP_TEXT}
+setup:
+  Interactively writes a .credentials file by asking for app_id, app_secret,
+  url_key, and the base URL one field at a time.
 `;
 
 const CHECK_HELP = `${HELP_TEXT}
@@ -108,6 +128,14 @@ const COMMON_OPTION_SPEC = {
   "-h": "boolean"
 };
 
+const SETUP_OPTION_SPEC = {
+  "--credentials": "string",
+  "--base-url": "string",
+  "--overwrite": "boolean",
+  "--help": "boolean",
+  "-h": "boolean"
+};
+
 const AUTH_OPTION_SPEC = {
   ...COMMON_OPTION_SPEC,
   "--validate": "boolean",
@@ -134,6 +162,21 @@ const INVOICE_BATCH_OPTION_SPEC = {
   "--persist-token": "boolean",
   "--token-cache": "string"
 };
+
+class PromptOutput extends Writable {
+  constructor(output) {
+    super();
+    this.output = output;
+    this.muted = false;
+  }
+
+  _write(chunk, encoding, callback) {
+    if (!this.muted) {
+      this.output.write(chunk, encoding);
+    }
+    callback();
+  }
+}
 
 function parseOptions(args, optionSpec) {
   const options = { _: [] };
@@ -194,6 +237,188 @@ function helpRequested(options) {
   return Boolean(options["--help"] || options["-h"]);
 }
 
+function interactivePromptsAvailable() {
+  return Boolean(process.stdin.isTTY && process.stdout.isTTY);
+}
+
+function resolveSetupDefaults(baseUrl) {
+  return {
+    appId: process.env.REFRENS_SETUP_APP_ID?.trim() || "",
+    appSecret: process.env.REFRENS_SETUP_APP_SECRET?.trim() || "",
+    urlKey: process.env.REFRENS_SETUP_URL_KEY?.trim() || "",
+    baseUrl:
+      process.env.REFRENS_SETUP_BASE_URL?.trim() ||
+      baseUrl ||
+      DEFAULT_BASE_URL
+  };
+}
+
+function missingCredentialsMessage(credentialsPath) {
+  return `Credentials file not found: ${credentialsPath}. Run \`refrens-api setup\` to create it interactively, or follow the guide at ${CREDENTIALS_GUIDE_URL}`;
+}
+
+async function promptText(reader, output, label, {
+  defaultValue,
+  required = true,
+  secret = false
+} = {}) {
+  while (true) {
+    const promptSuffix =
+      defaultValue !== undefined && defaultValue !== ""
+        ? ` [${defaultValue}]`
+        : "";
+    output.muted = secret;
+    const answer = await reader.question(`${label}${promptSuffix}: `);
+    output.muted = false;
+    if (secret) {
+      process.stdout.write("\n");
+    }
+
+    const value = answer.trim() || (defaultValue ?? "");
+    if (!required || value) {
+      return value;
+    }
+
+    process.stdout.write("A value is required.\n");
+  }
+}
+
+async function promptConfirm(reader, label, { defaultValue = false } = {}) {
+  const defaultHint = defaultValue ? "Y/n" : "y/N";
+  while (true) {
+    const answer = (await reader.question(`${label} [${defaultHint}]: `))
+      .trim()
+      .toLowerCase();
+    if (!answer) {
+      return defaultValue;
+    }
+    if (["y", "yes"].includes(answer)) {
+      return true;
+    }
+    if (["n", "no"].includes(answer)) {
+      return false;
+    }
+    process.stdout.write("Please answer yes or no.\n");
+  }
+}
+
+async function collectInteractiveCredentials({
+  credentialsPath,
+  baseUrl,
+  overwrite = false
+}) {
+  const defaults = resolveSetupDefaults(baseUrl);
+  const canPrompt = interactivePromptsAvailable();
+  const hasPrefilledRequiredValues = Boolean(
+    defaults.appId && defaults.appSecret && defaults.urlKey
+  );
+
+  if (!canPrompt && !hasPrefilledRequiredValues) {
+    throw new Error(
+      "Interactive setup requires a terminal. For automated setup, provide REFRENS_SETUP_APP_ID, REFRENS_SETUP_APP_SECRET, and REFRENS_SETUP_URL_KEY."
+    );
+  }
+
+  if (credentialsFileExists(credentialsPath) && !overwrite && !canPrompt) {
+    throw new Error(
+      `Credentials file already exists: ${credentialsPath}. Re-run with --overwrite to replace it.`
+    );
+  }
+
+  if (!canPrompt && hasPrefilledRequiredValues) {
+    writeCredentialsFile(
+      credentialsPath,
+      {
+        app_id: defaults.appId,
+        app_secret: defaults.appSecret,
+        url_key: defaults.urlKey,
+        base_url: defaults.baseUrl
+      },
+      { overwrite }
+    );
+
+    const permissionsSafe = credentialPermissionsSafe(credentialsPath);
+    return {
+      aborted: false,
+      credentialsFile: credentialsPath,
+      baseUrl: defaults.baseUrl,
+      approveOrigin: originFor(defaults.baseUrl),
+      guideUrl: CREDENTIALS_GUIDE_URL,
+      credentialPermissionsSafe: permissionsSafe
+    };
+  }
+
+  process.stdout.write(
+    `Interactive Refrens setup\nGuide: ${CREDENTIALS_GUIDE_URL}\n\n`
+  );
+
+  const promptOutput = new PromptOutput(process.stdout);
+  const reader = readline.createInterface({
+    input: process.stdin,
+    output: promptOutput,
+    terminal: true
+  });
+
+  try {
+    if (credentialsFileExists(credentialsPath) && !overwrite) {
+      const confirmed = await promptConfirm(
+        reader,
+        `Replace the existing credentials file at ${credentialsPath}?`,
+        { defaultValue: false }
+      );
+      if (!confirmed) {
+        return {
+          aborted: true,
+          credentialsFile: credentialsPath
+        };
+      }
+    }
+
+    const appId =
+      defaults.appId ||
+      (await promptText(reader, promptOutput, "App ID"));
+    const appSecret =
+      defaults.appSecret ||
+      (await promptText(reader, promptOutput, "App Secret", {
+        secret: true
+      }));
+    const urlKey =
+      defaults.urlKey ||
+      (await promptText(reader, promptOutput, "Business URL Key"));
+    const resolvedBaseUrl = await promptText(
+      reader,
+      promptOutput,
+      "Base URL",
+      {
+        defaultValue: defaults.baseUrl
+      }
+    );
+
+    writeCredentialsFile(
+      credentialsPath,
+      {
+        app_id: appId,
+        app_secret: appSecret,
+        url_key: urlKey,
+        base_url: resolvedBaseUrl
+      },
+      { overwrite: true }
+    );
+
+    const permissionsSafe = credentialPermissionsSafe(credentialsPath);
+    return {
+      aborted: false,
+      credentialsFile: credentialsPath,
+      baseUrl: resolvedBaseUrl,
+      approveOrigin: originFor(resolvedBaseUrl),
+      guideUrl: CREDENTIALS_GUIDE_URL,
+      credentialPermissionsSafe: permissionsSafe
+    };
+  } finally {
+    reader.close();
+  }
+}
+
 function ensureCredentialSafety(credentialsPath, options, command) {
   const permissionsSafe = credentialPermissionsSafe(credentialsPath);
   if (
@@ -218,8 +443,31 @@ function ensureCredentialSafety(credentialsPath, options, command) {
   return { permissionsSafe, blocked: false };
 }
 
-function loadEnvironment(options, command, { requireSecrets = true } = {}) {
+async function ensureCredentialsFile(credentialsPath, baseUrl) {
+  if (credentialsFileExists(credentialsPath)) {
+    return null;
+  }
+
+  if (!interactivePromptsAvailable()) {
+    throw new Error(missingCredentialsMessage(credentialsPath));
+  }
+
+  const setupResult = await collectInteractiveCredentials({
+    credentialsPath,
+    baseUrl
+  });
+  if (setupResult.aborted) {
+    throw new Error(`Credentials setup was canceled: ${credentialsPath}`);
+  }
+  return setupResult;
+}
+
+async function loadEnvironment(options, command, { requireSecrets = true } = {}) {
   const credentialsPath = resolveCredentialsPath(options["--credentials"]);
+  const setupResult = await ensureCredentialsFile(
+    credentialsPath,
+    options["--base-url"]
+  );
   const safety = ensureCredentialSafety(credentialsPath, options, command);
   if (safety.blocked) {
     return { blocked: true };
@@ -237,6 +485,7 @@ function loadEnvironment(options, command, { requireSecrets = true } = {}) {
 
   return {
     blocked: false,
+    setupResult,
     credentialsPath,
     permissionsSafe: safety.permissionsSafe,
     credentials,
@@ -262,6 +511,40 @@ function parseConfirmationPairs(values = []) {
     map[key] = hash;
   }
   return map;
+}
+
+async function runSetup(args) {
+  const options = parseOptions(args, SETUP_OPTION_SPEC);
+  if (helpRequested(options)) {
+    process.stdout.write(SETUP_HELP);
+    return 0;
+  }
+
+  const credentialsPath = resolveCredentialsPath(options["--credentials"]);
+  const setupResult = await collectInteractiveCredentials({
+    credentialsPath,
+    baseUrl: options["--base-url"],
+    overwrite: Boolean(options["--overwrite"])
+  });
+
+  if (setupResult.aborted) {
+    writeJson(setupResult);
+    return 2;
+  }
+
+  writeJson({
+    setupComplete: true,
+    credentialsFile: setupResult.credentialsFile,
+    baseUrl: setupResult.baseUrl,
+    approveOrigin: setupResult.approveOrigin,
+    guideUrl: setupResult.guideUrl,
+    credentialPermissionsSafe: setupResult.credentialPermissionsSafe,
+    nextCommands: {
+      check: `refrens-api check --credentials ${setupResult.credentialsFile}`,
+      auth: `refrens-api auth --credentials ${setupResult.credentialsFile} --approve-origin ${setupResult.approveOrigin} --validate`
+    }
+  });
+  return 0;
 }
 
 async function resolveTokenForRequest(env, options, { live = true } = {}) {
@@ -320,7 +603,7 @@ async function runCheck(args) {
     return 0;
   }
 
-  const env = loadEnvironment(options, "check");
+  const env = await loadEnvironment(options, "check");
   if (env.blocked) {
     return 3;
   }
@@ -345,7 +628,7 @@ async function runAuth(args) {
     return 0;
   }
 
-  const env = loadEnvironment(options, "auth");
+  const env = await loadEnvironment(options, "auth");
   if (env.blocked) {
     return 3;
   }
@@ -397,7 +680,7 @@ async function runRequest(args) {
 
   const method = options._[0].toUpperCase();
   const pathValue = options._[1];
-  const env = loadEnvironment(options, "request");
+  const env = await loadEnvironment(options, "request");
   if (env.blocked) {
     return 3;
   }
@@ -502,7 +785,7 @@ async function runInvoiceBatch(args) {
     throw new Error("invoice-batch requires --input <file>");
   }
 
-  const env = loadEnvironment(options, "invoice-batch");
+  const env = await loadEnvironment(options, "invoice-batch");
   if (env.blocked) {
     return 3;
   }
@@ -581,6 +864,8 @@ export async function runCli(argv = process.argv.slice(2)) {
 
     const [command, ...args] = argv;
     switch (command) {
+      case "setup":
+        return await runSetup(args);
       case "check":
         return await runCheck(args);
       case "auth":

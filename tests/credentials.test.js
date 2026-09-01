@@ -1,6 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { parseCredentialsText } from "../skills/refrens-api/scripts/lib/credentials.js";
+import {
+  formatCredentialsText,
+  parseCredentialsText
+} from "../skills/refrens-api/scripts/lib/credentials.js";
 
 test("parseCredentialsText supports export syntax, quoted values, and multiline private keys", () => {
   const credentials = parseCredentialsText(`
@@ -30,4 +33,18 @@ app_id="two"
 `),
     /Duplicate credential name/
   );
+});
+
+test("formatCredentialsText produces a setup-ready credentials file", () => {
+  const text = formatCredentialsText({
+    app_id: "demo-app",
+    app_secret: "demo-secret",
+    url_key: "demo-business",
+    base_url: "https://api.refrens.com"
+  });
+
+  assert.match(text, /app_id="demo-app"/);
+  assert.match(text, /app_secret="demo-secret"/);
+  assert.match(text, /url_key="demo-business"/);
+  assert.match(text, /base_url="https:\/\/api\.refrens\.com"/);
 });

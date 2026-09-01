@@ -13,6 +13,7 @@ It is designed for **safe, reviewable Refrens API usage**: authenticated request
 - `skills/refrens-api/SKILL.md` - installable skill definition
 - `skills/refrens-api/scripts/` - self-contained CLI implementation used by the skill
 - `skills/refrens-api/references/` - Refrens API notes, safety rules, and endpoint matrix
+- `skills/refrens-api/references/getting-credentials.md` - simple end-user guide for locating Refrens credentials
 - `skills/refrens-api/assets/invoice-batch.example.json` - offline-friendly batch input example
 - `skills/refrens-api/assets/invoice-batch.reference.example.json` - example using reference-invoice defaults
 - `tests/` - unit tests for credential parsing, request safety, and invoice batch planning
@@ -22,6 +23,7 @@ It is designed for **safe, reviewable Refrens API usage**: authenticated request
 
 - App-secret authentication against `POST /authentication`
 - Default base URL of `https://api.refrens.com`
+- Interactive `setup` command for creating `.credentials`
 - Exact documented path preservation, including `/businesses/...` and `/api/v1/businesses/...`
 - Endpoint allowlist for supported routes
 - `.credentials` parsing without sourcing or executing shell content
@@ -36,7 +38,7 @@ It is designed for **safe, reviewable Refrens API usage**: authenticated request
 - Node.js 18.18+ (tested with modern Node)
 - Refrens API access enabled on your Refrens business
 - Refrens API credentials
-- A working `.credentials` file in your current directory, or `--credentials <path>`
+- A working `.credentials` file in your current directory, or use `setup` / `--credentials <path>` to create one
 
 ## Refrens setup and authentication
 
@@ -85,6 +87,28 @@ Protected Refrens requests then send the returned JWT as an `Authorization` head
 
 Refrens also documents a self-signed ES256 JWT flow using the private key they provide. That flow is described in the included reference docs, but this package intentionally stays with app-secret auth to keep the runtime lightweight and predictable.
 
+### 4) Create `.credentials` interactively
+
+If you do not have a credentials file yet, run:
+
+```powershell
+npx refrens-api-skill setup
+```
+
+The setup flow asks for:
+
+1. App ID
+2. App Secret
+3. Business URL Key
+4. Base URL (defaults to `https://api.refrens.com`)
+
+If you need help finding those values, use the simple guide here:
+
+- local file: `skills/refrens-api/references/getting-credentials.md`
+- GitHub link: <https://github.com/Ashwinning/refrens-api-skill/blob/main/skills/refrens-api/references/getting-credentials.md>
+
+When you run `check`, `auth`, `request`, or `invoice-batch` in an interactive terminal and `.credentials` is missing, the CLI starts the same setup flow automatically.
+
 ## Install the skill
 
 Public GitHub skill installs are expected to work with:
@@ -108,7 +132,7 @@ Other supported install shapes depend on the local skills CLI version, but curre
 - direct GitHub tree URLs
 - local paths
 
-After installation, the skill file is `skills/refrens-api/SKILL.md`.
+In this repository, the installable skill lives at `skills/refrens-api/SKILL.md`.
 
 ## Run the CLI directly
 
@@ -152,6 +176,7 @@ Notes:
 Recommended first run:
 
 ```powershell
+npx refrens-api-skill setup
 node .\bin\refrens-api.js check --credentials .\.credentials
 node .\bin\refrens-api.js auth --credentials .\.credentials --approve-origin https://api.refrens.com --validate
 ```
@@ -191,7 +216,27 @@ Any change to method, path, base URL, or request body changes the hash.
 
 ## Command reference
 
-### 1) `check`
+### 1) `setup`
+
+Create or replace `.credentials` interactively:
+
+```powershell
+npx refrens-api-skill setup
+```
+
+Pick a custom location:
+
+```powershell
+npx refrens-api-skill setup --credentials C:\path\to\.credentials
+```
+
+Replace an existing file intentionally:
+
+```powershell
+npx refrens-api-skill setup --overwrite
+```
+
+### 2) `check`
 
 Validate the credential file, Windows ACL safety checks, and resolved base URL without a network call:
 
@@ -214,7 +259,7 @@ Example output:
 }
 ```
 
-### 2) `auth`
+### 3) `auth`
 
 Authenticate without printing the bearer token:
 
@@ -240,7 +285,7 @@ Token persistence notes:
 - default location: next to the selected credentials file
 - supported only on Windows
 
-### 3) `request`
+### 4) `request`
 
 Generic request flow for supported `GET`, `POST`, and `PATCH` endpoints.
 
@@ -282,7 +327,7 @@ npx refrens-api-skill request GET '/businesses/:urlKey/invoices?$limit=5' `
 
 If a cached-token `GET` returns `401`, the CLI performs one fresh-auth retry.
 
-### 4) `invoice-batch`
+### 5) `invoice-batch`
 
 Generic invoice creation workflow driven by a JSON input file.
 
