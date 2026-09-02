@@ -4,7 +4,7 @@
   "description": "Safe Refrens API CLI and GitHub skill for authenticated requests and invoice batch workflows.",
   "type": "module",
   "bin": {
-    "refrens-api": "./bin/refrens-api.js"
+    "refrens-api": "bin/refrens-api.js"
   },
   "files": [
     "bin/",
