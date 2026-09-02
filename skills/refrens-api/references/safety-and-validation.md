@@ -18,7 +18,7 @@ If method, path, body, or origin changes, preview and confirm again.
 - Do not blindly retry ambiguous mutations.
 - Client create and lead create are only retry-safe with the documented idempotent identifiers and an identical payload.
 - Lead comment/note batches are only retry-safe with the same `clientRequestId` and identical content.
-- This repository performs a single fresh-auth retry for cached-token `GET` calls that fail with `401`.
+- This CLI performs a single fresh-auth retry for cached-token `GET` calls that fail with `401`.
 
 ## Secret handling
 

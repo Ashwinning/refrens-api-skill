@@ -2,7 +2,7 @@
 
 Official source index: <https://www.refrens.com/api/docs/>
 
-Default base URL in this project:
+Default base URL in this CLI:
 
 ```text
 https://api.refrens.com

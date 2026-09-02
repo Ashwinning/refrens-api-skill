@@ -27,7 +27,7 @@ These are routing and safety notes, not a substitute for re-reading the official
 - Equivalent retries are only safe when the `clientId` and full payload stay unchanged.
 - No list, update, or delete client operation is currently documented for this helper.
 
-## Invoice batch workflow in this repository
+## Invoice batch workflow in this CLI
 
 The batch helper is intentionally generic:
 

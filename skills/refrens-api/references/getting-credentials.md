@@ -1,6 +1,6 @@
 # Getting Refrens credentials
 
-Use this short guide when the skill or CLI asks you to set up `.credentials`.
+Use this short guide when the skill or published CLI asks you to set up `.credentials`.
 
 ## What you need
 
@@ -30,7 +30,7 @@ Run:
 npx refrens-api-skill setup
 ```
 
-Or, from the installed skill directory:
+For a local checkout of the skill, the equivalent is:
 
 ```powershell
 node .\scripts\refrens-api.js setup

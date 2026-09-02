@@ -5,7 +5,7 @@ Official sources:
 - <https://www.refrens.com/api/docs/>
 - <https://www.refrens.com/api/docs/authentication/>
 
-This repository defaults the base URL to:
+This CLI defaults the base URL to:
 
 ```text
 https://api.refrens.com
@@ -21,7 +21,7 @@ Once API access is enabled, generate keys from the Refrens dashboard integration
 
 `Business Settings -> Integrations -> Accounting Integrations -> Generate API Keys`
 
-If the local `.credentials` file does not exist yet, run `refrens-api setup` or `npx refrens-api-skill setup` and keep this guide open while you copy the values.
+If the local `.credentials` file does not exist yet, run `npx refrens-api-skill setup` and keep this guide open while you copy the values. For a local checkout of the skill, the explicit equivalent is `node .\scripts\refrens-api.js setup`.
 
 ## Supported local credential names
 
@@ -81,7 +81,7 @@ Content-Type: application/json
 
 ## Optional Windows token cache
 
-This repository includes an explicit opt-in Windows-only token cache:
+This CLI includes an explicit opt-in Windows-only token cache:
 
 - cache file: `.refrens-token.dpapi`
 - encryption: Windows user DPAPI
@@ -108,7 +108,7 @@ Refrens also documents ES256 self-signed JWT auth. Claims include:
 }
 ```
 
-This repository does not generate self-signed JWTs directly; it stays with the simpler `app-secret` flow to keep the package lightweight and dependency-free.
+This skill does not generate self-signed JWTs directly; it stays with the simpler `app-secret` flow to keep the published package lightweight and dependency-free.
 
 ## Error notes
 

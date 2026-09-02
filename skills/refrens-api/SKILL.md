@@ -18,29 +18,35 @@ Use the official Refrens docs at <https://www.refrens.com/api/docs/> as the sour
 3. Read `references/endpoint-matrix.md`.
 4. Read `references/resource-notes.md` for the resource you plan to use.
 5. Read `references/safety-and-validation.md` before any `POST` or `PATCH`.
-6. Use `scripts/refrens-api.js` or the published npm package rather than inventing raw requests.
+6. Use the published npm CLI or the local script rather than inventing raw requests.
 
-## Included tooling
+## Install and tooling
 
-From the skill directory:
+Install the skill:
 
 ```powershell
-node .\scripts\refrens-api.js --help
+npx skills add Ashwinning/refrens-api-skill
 ```
 
-From npm after publication:
+Explicit equivalent:
+
+```powershell
+npx skills add Ashwinning/refrens-api-skill --skill refrens-api
+```
+
+Because this repo contains one skill, `--skill refrens-api` is optional.
+
+Run the published CLI:
 
 ```powershell
 npx refrens-api-skill --help
 ```
 
-From a public skills install:
+From a local checkout of the skill:
 
 ```powershell
-npx skills add Ashwinning/refrens-api-skill -a github-copilot
+node .\scripts\refrens-api.js --help
 ```
-
-This repository currently contains one skill, so `--skill refrens-api` is optional when installing from the repo root.
 
 ## Safe workflow
 
@@ -58,42 +64,42 @@ This repository currently contains one skill, so `--skill refrens-api` is option
 ### Validate local setup
 
 ```powershell
-node .\scripts\refrens-api.js check
+npx refrens-api-skill check
 ```
 
 ### First-time setup
 
 ```powershell
-node .\scripts\refrens-api.js setup
+npx refrens-api-skill setup
 ```
 
 ### Authenticate
 
 ```powershell
-node .\scripts\refrens-api.js auth --approve-origin https://api.refrens.com
+npx refrens-api-skill auth --approve-origin https://api.refrens.com
 ```
 
 ### Read invoices
 
 ```powershell
-node .\scripts\refrens-api.js request GET '/businesses/:urlKey/invoices?$limit=5' --approve-origin https://api.refrens.com
+npx refrens-api-skill request GET '/businesses/:urlKey/invoices?$limit=5' --approve-origin https://api.refrens.com
 ```
 
 ### Preview an invoice creation
 
 ```powershell
-node .\scripts\refrens-api.js request POST /businesses/:urlKey/invoices --body-file .\invoice.json --dry-run
+npx refrens-api-skill request POST /businesses/:urlKey/invoices --body-file .\invoice.json --dry-run
 ```
 
 ### Preview a batch
 
 ```powershell
-node .\scripts\refrens-api.js invoice-batch preview --input .\invoice-batch.json
+npx refrens-api-skill invoice-batch preview --input .\invoice-batch.json
 ```
 
 ## Batch invoices
 
-Use `assets/invoice-batch.example.json` for an offline-friendly template, or `assets/invoice-batch.reference.example.json` when you want to copy defaults from an existing invoice. Do not add personal data, local absolute paths, or user-specific invoice entries to the repository.
+Use `assets/invoice-batch.example.json` for an offline-friendly template, or `assets/invoice-batch.reference.example.json` when you want to copy defaults from an existing invoice. Do not add personal data, local absolute paths, or user-specific invoice entries to skill files.
 
 ## Notes
 
