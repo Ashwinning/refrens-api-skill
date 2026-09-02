@@ -1,13 +1,47 @@
 # Refrens API Skill
 
-Open-source Refrens tooling that ships both:
+Use your Refrens account from popular coding agents such as **ChatGPT (work mode / Codex)**, **Claude Code**, **GitHub Copilot**, **Cursor**, and other agentic developer tools that can use installed skills or run a CLI. This project gives those agents a safe, reviewable way to turn messy business input—handwritten invoice photos, receipt images, payment confirmations, CRM notes, spreadsheet rows, or internal finance instructions—into structured Refrens actions through the Refrens API.
+
+Why use this: if your team already works inside AI coding agents, this skill lets those agents help operate your Refrens account instead of stopping at drafts. They can guide setup, structure data, preview mutations safely, and then create invoices, expenditures, payments, leads, clients, and IRN requests with explicit review points.
+
+## Quick start
+
+Install the skill:
+
+```powershell
+npx skills add Ashwinning/refrens-api-skill --skill refrens-api
+```
+
+Add `-a github-copilot`, `-a claude-code`, or another supported host when you want to target one specific agent directly.
+
+Then set up credentials:
+
+```powershell
+npx refrens-api-skill setup
+```
+
+## Example workflows
+
+These are the kinds of AI-assisted workflows this repo is designed for, based on Refrens' invoicing, CRM, expense, payment, and e-invoicing surfaces:
+
+1. **Handwritten invoice or work-note to digital invoice** — An agent can read images, PDFs, or plain-language notes, extract dates, line items, taxes, and client details, and then preview or create a structured Refrens invoice.
+2. **Receipt or vendor bill to expenditure entry** — An agent can pull vendor names, totals, tax values, and dates from receipts or bills and record them as Refrens expenditures.
+3. **Payment confirmation to invoice reconciliation** — An agent can read UTRs, bank confirmation emails, chat messages, or internal notes and add payment updates to the right Refrens invoice.
+4. **Website form, WhatsApp chat, or call note to CRM lead** — An agent can turn unstructured sales inputs into properly staged Refrens leads with customer/contact details, pipeline, stage, tags, and notes.
+5. **GST-ready invoice to IRN generation** — After an invoice exists and the Indian tax fields are in place, an agent can help validate the data and trigger Refrens IRN generation for e-invoicing workflows.
+
+The same pattern also works for importing or normalizing client records before billing, since the documented Clients API supports creating and retrieving API-owned clients by `clientId`.
+
+Refrens also markets broader product capabilities like quotations, inventory, and payment reminders. This repo intentionally focuses on the documented API-backed overlap that is currently safest for agent automation: invoices, expenditures, payments, leads, clients, and IRN generation.
+
+## What ships in this repo
 
 - a publishable npm package you can run with `npx`, and
 - an installable GitHub skill at `skills/refrens-api`.
 
 It is designed for **safe, reviewable Refrens API usage**: authenticated requests, dry-run confirmation hashes for mutations, `:urlKey` placeholder expansion, response redaction, and a generic invoice batch workflow driven by JSON input.
 
-## What this repository contains
+### Repository layout
 
 - `bin/refrens-api.js` - npm CLI entrypoint
 - `skills/refrens-api/SKILL.md` - installable skill definition
@@ -109,13 +143,7 @@ If you need help finding those values, use the simple guide here:
 
 When you run `check`, `auth`, `request`, or `invoice-batch` in an interactive terminal and `.credentials` is missing, the CLI starts the same setup flow automatically.
 
-## Install the skill
-
-Public GitHub skill installs are expected to work with:
-
-```powershell
-npx skills add Ashwinning/refrens-api-skill --skill refrens-api
-```
+## Install options
 
 Example installs for common agent hosts:
 
