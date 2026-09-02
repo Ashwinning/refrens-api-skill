@@ -37,8 +37,10 @@ npx refrens-api-skill --help
 From a public skills install:
 
 ```powershell
-npx skills add Ashwinning/refrens-api-skill --skill refrens-api -a github-copilot
+npx skills add Ashwinning/refrens-api-skill -a github-copilot
 ```
+
+This repository currently contains one skill, so `--skill refrens-api` is optional when installing from the repo root.
 
 ## Safe workflow
 

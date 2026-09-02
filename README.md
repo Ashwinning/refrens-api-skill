@@ -11,10 +11,10 @@ Why use this: if your team already works inside AI coding agents, this skill let
 Install the skill:
 
 ```powershell
-npx skills add Ashwinning/refrens-api-skill --skill refrens-api
+npx skills add Ashwinning/refrens-api-skill
 ```
 
-Add `-a github-copilot`, `-a claude-code`, or another supported host when you want to target one specific agent directly.
+Add `-a github-copilot`, `-a claude-code`, or another supported host when you want to target one specific agent directly. Because this repository currently contains one skill, `--skill refrens-api` is optional.
 
 Then set up credentials:
 
@@ -167,9 +167,9 @@ When you run `check`, `auth`, `request`, or `invoice-batch` in an interactive te
 Example installs for common agent hosts:
 
 ```powershell
-npx skills add Ashwinning/refrens-api-skill --skill refrens-api -a github-copilot
-npx skills add Ashwinning/refrens-api-skill --skill refrens-api -a claude-code
-npx skills add Ashwinning/refrens-api-skill --skill refrens-api -g -a github-copilot
+npx skills add Ashwinning/refrens-api-skill -a github-copilot
+npx skills add Ashwinning/refrens-api-skill -a claude-code
+npx skills add Ashwinning/refrens-api-skill -g -a github-copilot
 ```
 
 Other supported install shapes depend on the local skills CLI version, but current skills tooling commonly supports:
@@ -178,6 +178,12 @@ Other supported install shapes depend on the local skills CLI version, but curre
 - GitHub repository URLs
 - direct GitHub tree URLs
 - local paths
+
+If you want the explicit equivalent, this also works:
+
+```powershell
+npx skills add Ashwinning/refrens-api-skill --skill refrens-api -a github-copilot
+```
 
 In this repository, the installable skill lives at `skills/refrens-api/SKILL.md`.
 
@@ -268,7 +274,7 @@ Installing the skill is a separate step from storing credentials.
 When someone runs:
 
 ```powershell
-npx skills add Ashwinning/refrens-api-skill --skill refrens-api -a github-copilot
+npx skills add Ashwinning/refrens-api-skill -a github-copilot
 ```
 
 the skill files are copied or symlinked into the agent's skill directory, but credentials are still written only when the operator runs the setup flow. By default that means `.credentials` is created in the project directory where the operator is working, not inside `.agents/skills/refrens-api`.
