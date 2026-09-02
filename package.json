@@ -1,7 +1,6 @@
 {
   "name": "refrens-api-skill",
   "version": "0.1.0",
-  "private": true,
   "description": "Safe Refrens API CLI and GitHub skill for authenticated requests and invoice batch workflows.",
   "type": "module",
   "bin": {
