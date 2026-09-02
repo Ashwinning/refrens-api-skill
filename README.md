@@ -181,6 +181,51 @@ node .\bin\refrens-api.js check --credentials .\.credentials
 node .\bin\refrens-api.js auth --credentials .\.credentials --approve-origin https://api.refrens.com --validate
 ```
 
+## Where credentials are stored
+
+The CLI keeps credential storage intentionally simple:
+
+| File | Default location | When it is created | What it contains |
+| --- | --- | --- | --- |
+| `.credentials` | Your current working directory | `setup`, first-run setup fallback, or manual creation | `app_id`, `app_secret`, `url_key`, and optional `base_url` |
+| `.refrens-token.dpapi` | Next to the selected credentials file | Only when you use `--persist-token` | Windows-user-encrypted JWT cache |
+
+Important details:
+
+- `setup` writes `.credentials` to the directory where you run the command, unless you override it with `--credentials C:\path\to\.credentials`.
+- the package does **not** store secrets inside the npm package, inside the installed skill folder, or inside the GitHub repository
+- the optional token cache is created only when you explicitly opt in with `--persist-token`
+- both files are meant to stay local and ignored by git
+
+### What happens with `npx`
+
+When someone runs:
+
+```powershell
+npx refrens-api-skill setup
+```
+
+`npx` downloads the package to npm's cache if it is not already available, then runs the published `refrens-api` bin from that cached package. The important part is that the CLI still treats **your current working directory** as the place where `.credentials` should live.
+
+That means:
+
+- the executable code can come from npm cache
+- the persisted `.credentials` file is written to the caller's current directory
+- `--credentials <path>` moves that storage location wherever the caller wants
+- if `--persist-token` is used later, `.refrens-token.dpapi` is written next to that chosen credentials file
+
+### What happens with `npx skills add`
+
+Installing the skill is a separate step from storing credentials.
+
+When someone runs:
+
+```powershell
+npx skills add Ashwinning/refrens-api-skill --skill refrens-api -a github-copilot
+```
+
+the skill files are copied or symlinked into the agent's skill directory, but credentials are still written only when the operator runs the setup flow. By default that means `.credentials` is created in the project directory where the operator is working, not inside `.agents/skills/refrens-api`.
+
 ### Base URL precedence
 
 1. `--base-url`

@@ -37,3 +37,5 @@ node .\scripts\refrens-api.js setup
 ```
 
 The CLI will ask for each value one by one and write a local `.credentials` file for you.
+
+By default, that `.credentials` file is written to the directory where you run the command. If you want it somewhere else, run setup with `--credentials C:\path\to\.credentials`.
