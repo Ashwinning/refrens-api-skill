@@ -1,5 +1,7 @@
 # Refrens API Skill
 
+(Not officially affiliated with Refrens)
+
 Use your Refrens account from popular coding agents such as **ChatGPT (work mode / Codex)**, **Claude Code**, **GitHub Copilot**, **Cursor**, and other agentic developer tools that can use installed skills or run a CLI. This project gives those agents a safe, reviewable way to turn messy business input—handwritten invoice photos, receipt images, payment confirmations, CRM notes, spreadsheet rows, or internal finance instructions—into structured Refrens actions through the Refrens API.
 
 Why use this: if your team already works inside AI coding agents, this skill lets those agents help operate your Refrens account instead of stopping at drafts. They can guide setup, structure data, preview mutations safely, and then create invoices, expenditures, payments, leads, clients, and IRN requests with explicit review points.
@@ -22,15 +24,32 @@ npx refrens-api-skill setup
 
 ## Example workflows
 
-These are the kinds of AI-assisted workflows this repo is designed for, based on Refrens' invoicing, CRM, expense, payment, and e-invoicing surfaces:
+These are the kinds of high-value AI-assisted workflows this repo is designed for, based on the documented Refrens API surfaces for invoices, expenditures, payments, leads, clients, and IRN generation.
 
-1. **Handwritten invoice or work-note to digital invoice** — An agent can read images, PDFs, or plain-language notes, extract dates, line items, taxes, and client details, and then preview or create a structured Refrens invoice.
-2. **Receipt or vendor bill to expenditure entry** — An agent can pull vendor names, totals, tax values, and dates from receipts or bills and record them as Refrens expenditures.
-3. **Payment confirmation to invoice reconciliation** — An agent can read UTRs, bank confirmation emails, chat messages, or internal notes and add payment updates to the right Refrens invoice.
-4. **Website form, WhatsApp chat, or call note to CRM lead** — An agent can turn unstructured sales inputs into properly staged Refrens leads with customer/contact details, pipeline, stage, tags, and notes.
-5. **GST-ready invoice to IRN generation** — After an invoice exists and the Indian tax fields are in place, an agent can help validate the data and trigger Refrens IRN generation for e-invoicing workflows.
+### Turn messy paperwork into revenue-ready records
 
-The same pattern also works for importing or normalizing client records before billing, since the documented Clients API supports creating and retrieving API-owned clients by `clientId`.
+- **Convert handwritten invoice photos, scanned PDFs, or rough work notes into digital invoices** — An agent can extract dates, line items, taxes, client details, and billing context, then prepare a clean Refrens invoice for review.
+- **Turn vendor bills, receipt images, and expense proofs into structured expenditure entries** — An agent can pull totals, tax values, vendor names, and dates from unstructured documents and record them as Refrens expenditures.
+
+### Put recurring billing and finance ops on autopilot
+
+- **Generate repeat invoices from retainers, monthly service plans, or spreadsheet exports** — An agent can prepare invoice batches for recurring work, preview everything safely, and keep repeated billing consistent month after month.
+- **Reuse known invoice defaults instead of rebuilding them every cycle** — An agent can copy stable fields such as `billedTo`, currency, invoice type, tax rates, or line-item defaults from prior invoices and apply them to new ones.
+
+### Close the loop from payment signal to books updated
+
+- **Sync UTRs, bank confirmation emails, payment screenshots, and finance chat messages to the correct invoice** — An agent can interpret incoming payment evidence and add payment updates to the matching Refrens invoice.
+- **Reconcile collections faster by reviewing invoice and payment history together** — An agent can look up invoices, inspect payment records, and help operators decide what is still unpaid, partially paid, or ready to be marked off.
+
+### Feed your sales pipeline without copy-paste CRM work
+
+- **Turn website forms, WhatsApp chats, call summaries, and meeting notes into Refrens CRM leads** — An agent can convert unstructured sales input into properly staged leads with customer/contact details, pipeline, stage, source, tags, budget, and assignee data.
+- **Normalize client records before billing or lead sync** — An agent can create or fetch API-managed clients by `clientId` so downstream invoice or CRM workflows start from clean, reusable customer records.
+
+### Stay GST-ready without last-minute compliance scrambles
+
+- **Validate invoice data before you trigger IRN generation** — An agent can help review required billing and tax fields, catch obvious gaps, and prepare a safer IRN request flow for Indian e-invoicing.
+- **Generate IRNs for invoices that are already ready in Refrens** — Once the invoice exists and the tax details are correct, an agent can help initiate Refrens IRN generation and optionally include payment details when needed.
 
 Refrens also markets broader product capabilities like quotations, inventory, and payment reminders. This repo intentionally focuses on the documented API-backed overlap that is currently safest for agent automation: invoices, expenditures, payments, leads, clients, and IRN generation.
 
