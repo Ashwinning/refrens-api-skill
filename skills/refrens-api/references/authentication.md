@@ -28,6 +28,10 @@ Once API access is enabled, generate keys from the Refrens dashboard integration
 
 If the local `.credentials` file does not exist yet, run `npx refrens-api-skill setup` and keep this guide open while you copy the values. For a local checkout of the skill, the explicit equivalent is `node .\scripts\refrens-api.js setup`.
 
+If you are assisting another user, first share this guide URL before you run setup or ask them to paste credentials, unless you are already collecting the values for them directly in the browser:
+
+<https://github.com/Ashwinning/refrens-api-skill/blob/main/skills/refrens-api/references/getting-credentials.md>
+
 ## Supported local credential names
 
 The CLI reads these names from `.credentials`:

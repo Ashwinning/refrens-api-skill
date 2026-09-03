@@ -2,6 +2,10 @@
 
 Use this short local guide when the skill or published CLI asks you to set up `.credentials`.
 
+If you are assisting another user, share this page link with them before you run `setup` or ask them to paste credentials, unless you are already gathering the values yourself in the browser:
+
+<https://github.com/Ashwinning/refrens-api-skill/blob/main/skills/refrens-api/references/getting-credentials.md>
+
 For supported route work, start with `SKILL.md`, `endpoint-matrix.md`, and `authentication.md` before leaving the bundled docs. If the auth setup details here ever disagree with a live result, use the fallback URL listed in `authentication.md` and cite the exact URL used.
 
 ## What you need

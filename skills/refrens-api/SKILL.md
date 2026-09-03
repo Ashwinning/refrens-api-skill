@@ -20,8 +20,10 @@ Whenever you use live docs, cite the exact URL you opened.
 ## Before every live operation
 
 1. If `.credentials` is missing, first read `references/getting-credentials.md` and either:
+   - share this guide URL with the user before running setup: <https://github.com/Ashwinning/refrens-api-skill/blob/main/skills/refrens-api/references/getting-credentials.md>
    - ask the user for `app_id`, `app_secret`, and `url_key`, or
    - tell them to run `npx refrens-api-skill setup`
+   - skip the guide-share step only if you are already using the browser yourself to collect the credentials for them
 2. Read `references/endpoint-matrix.md` to confirm the route is allowlisted.
 3. Read the matching section in `references/route-reference.md`.
 4. Read `references/authentication.md` for token handling or the `/authentication` route.
@@ -61,6 +63,7 @@ node .\scripts\refrens-api.js --help
 ## Safe workflow
 
 - credentials are read from `.credentials` unless an explicit path is supplied
+- before running setup for another user, first share the getting-credentials guide URL unless you are already fetching the values for them in the browser
 - default base URL is `https://api.refrens.com`
 - literal `:urlKey` placeholders are expanded from the credential file in memory
 - supported routes are limited to the local allowlist in `references/endpoint-matrix.md`
@@ -80,6 +83,10 @@ npx refrens-api-skill check
 ```
 
 ### First-time setup
+
+Share this guide URL first unless you are already using the browser yourself to obtain the credentials:
+
+<https://github.com/Ashwinning/refrens-api-skill/blob/main/skills/refrens-api/references/getting-credentials.md>
 
 ```powershell
 npx refrens-api-skill setup
