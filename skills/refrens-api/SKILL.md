@@ -7,18 +7,28 @@ compatibility: Requires Node.js 18.18+ and network access to https://api.refrens
 
 # Refrens API
 
-Use the official Refrens docs at <https://www.refrens.com/api/docs/> as the source of truth. Re-check the relevant official page before relying on fields or response shapes that may have changed.
+Bundled local references are the first source for every currently supported Refrens route in this skill. Start with the markdown files under `references/`, stay inside the allowlist in `references/endpoint-matrix.md`, and use `references/route-reference.md` as the primary route guide.
+
+Only consult the live Refrens docs when:
+
+- the bundled local docs are insufficient for the supported route you are using
+- a field or response shape does not match the local bundle
+- a live call returns an error that the local bundle does not explain
+
+Whenever you use live docs, cite the exact URL you opened.
 
 ## Before every live operation
 
 1. If `.credentials` is missing, first read `references/getting-credentials.md` and either:
    - ask the user for `app_id`, `app_secret`, and `url_key`, or
    - tell them to run `npx refrens-api-skill setup`
-2. Read `references/authentication.md`.
-3. Read `references/endpoint-matrix.md`.
-4. Read `references/resource-notes.md` for the resource you plan to use.
-5. Read `references/safety-and-validation.md` before any `POST` or `PATCH`.
-6. Use the published npm CLI or the local script rather than inventing raw requests.
+2. Read `references/endpoint-matrix.md` to confirm the route is allowlisted.
+3. Read the matching section in `references/route-reference.md`.
+4. Read `references/authentication.md` for token handling or the `/authentication` route.
+5. Read `references/resource-notes.md` for shared resource caveats.
+6. Read `references/safety-and-validation.md` before any `POST` or `PATCH`.
+7. Only if the local bundle is insufficient, mismatched, or contradicted by a live error, open the route's fallback official URL and cite that exact URL.
+8. Use the published npm CLI or the local script rather than inventing raw requests.
 
 ## Install and tooling
 
@@ -53,11 +63,13 @@ node .\scripts\refrens-api.js --help
 - credentials are read from `.credentials` unless an explicit path is supplied
 - default base URL is `https://api.refrens.com`
 - literal `:urlKey` placeholders are expanded from the credential file in memory
-- supported routes are limited to the documented allowlist in `references/endpoint-matrix.md`
+- supported routes are limited to the local allowlist in `references/endpoint-matrix.md`
+- route-specific local details live in `references/route-reference.md`
 - dry-runs print a redacted preview and a request-bound `confirmationHash`
 - live `POST` and `PATCH` require the exact hash from the approved dry-run
 - live auth and live requests require `--approve-origin` for the exact HTTPS origin
 - tokens are kept in memory unless the user explicitly opts into the Windows DPAPI cache
+- live docs are fallback-only for supported routes, and every live-doc check must cite the exact URL used
 
 ## Primary commands
 
@@ -106,4 +118,5 @@ Use `assets/invoice-batch.example.json` for an offline-friendly template, or `as
 - preserve Refrens path prefixes exactly as documented
 - never print credentials, tokens, or authorization headers
 - do not assume undocumented retry guarantees
-- stop when an endpoint or field is undocumented instead of guessing
+- stop when a route is outside the local allowlist instead of guessing
+- for supported routes, start local-first and use the listed official fallback URL only when necessary

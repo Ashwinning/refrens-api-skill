@@ -1,9 +1,14 @@
 # Authentication
 
-Official sources:
+This is the bundled auth route reference for the skill. Start here for the supported `/authentication` flow and for token-handling rules used by the other allowlisted routes.
 
-- <https://www.refrens.com/api/docs/>
+Use the fallback official auth docs only when this local guide is insufficient, the returned auth shape differs, or an auth error needs confirmation. Whenever you do, cite the exact URL used.
+
+Fallback official URLs:
+
 - <https://www.refrens.com/api/docs/authentication/>
+- <https://www.refrens.com/api/docs/authentication/#create-token>
+- <https://www.refrens.com/api/docs/authentication/#auth-revalidation>
 
 This CLI defaults the base URL to:
 
@@ -11,7 +16,7 @@ This CLI defaults the base URL to:
 https://api.refrens.com
 ```
 
-Preserve the documented endpoint paths exactly as published on the Refrens docs.
+Preserve the documented endpoint paths exactly as published.
 
 ## Getting API access and credentials
 
@@ -34,6 +39,16 @@ The CLI reads these names from `.credentials`:
 - `base_url` -> optional base URL override
 
 Never print their values.
+
+## Bundled `/authentication` route summary
+
+The skill uses the dedicated `auth` command for this route:
+
+```powershell
+npx refrens-api-skill auth --approve-origin https://api.refrens.com
+```
+
+Add `--validate` when you want the CLI to revalidate the issued token with the same endpoint.
 
 ## App-secret authentication
 
@@ -60,7 +75,7 @@ Local safety rules:
 
 - keep `accessToken` in memory only by default
 - never print the raw token
-- send it as `Authorization: Bearer <token>` on protected calls
+- send it as `Authorization: ******` on protected calls
 - when using this CLI, require explicit `--approve-origin` for the live host
 
 ## Token validation
@@ -69,7 +84,7 @@ Revalidate a bearer token with:
 
 ```http
 POST /authentication
-Authorization: Bearer <token>
+Authorization: ******
 Content-Type: application/json
 ```
 

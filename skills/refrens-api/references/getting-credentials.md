@@ -1,6 +1,8 @@
 # Getting Refrens credentials
 
-Use this short guide when the skill or published CLI asks you to set up `.credentials`.
+Use this short local guide when the skill or published CLI asks you to set up `.credentials`.
+
+For supported route work, start with `SKILL.md`, `endpoint-matrix.md`, and `authentication.md` before leaving the bundled docs. If the auth setup details here ever disagree with a live result, use the fallback URL listed in `authentication.md` and cite the exact URL used.
 
 ## What you need
 
